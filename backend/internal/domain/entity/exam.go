@@ -48,7 +48,8 @@ type ExamRecord struct {
 	Passed          bool           `gorm:"default:false" json:"passed"`
 	ScoreHash       string         `gorm:"size:128" json:"score_hash"` // SHA-256 签名防篡改
 	TabSwitchCnt    int            `gorm:"default:0" json:"tab_switch_cnt"`
-	AuditLog        string         `gorm:"type:text" json:"audit_log"` // 行为审计 JSON
+	AuditLog        string         `gorm:"type:text" json:"audit_log"`       // 行为审计 JSON
+	SubjectiveDetail string         `gorm:"type:json" json:"subjective_detail"` // 主观题批改详情 JSON: [{qid, score, comment, grader, graded_at}]
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`

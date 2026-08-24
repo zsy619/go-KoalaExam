@@ -54,7 +54,7 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 	userH := handler.NewUserHandler(userApp)
 	qH := handler.NewQuestionHandler(qApp)
 	pH := handler.NewPaperHandler(paperApp)
-	eH := handler.NewExamHandler(examApp, gradingApp)
+	eH := handler.NewExamHandler(examApp, gradingApp, db)
 	fH := handler.NewFavoriteHandler(favApp)
 	statsApp := statistics.NewStatisticsApp(db, recordRepo, favRepo, wrongRepo)
 	statsH := handler.NewStatisticsHandler(statsApp)
@@ -115,12 +115,14 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 		ta.DELETE("/papers/:id", pH.Delete)
 
 		ta.POST("/exams", eH.Create)
+		ta.GET("/admin/exam-records", eH.AdminListRecords)
 		ta.GET("/exams", eH.List)
 		ta.GET("/exams/:id", eH.Get)
 		ta.PUT("/exams/:id", eH.Update)
 		ta.DELETE("/exams/:id", eH.Delete)
 		ta.GET("/exams/:id/records", eH.Records)
 		ta.POST("/grading/subjective", eH.GradeSubjective)
+		ta.POST("/grading/subjective/batch", eH.GradeSubjectiveBatch)
 
 		// 统计
 		auth.GET("/stats/me", statsH.MyLearning)

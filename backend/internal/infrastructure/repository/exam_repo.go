@@ -76,6 +76,11 @@ func (r *ExamRecordRepository) Create(ctx context.Context, rec *entity.ExamRecor
 	return r.db.WithContext(ctx).Create(rec).Error
 }
 
+// DB 暴露 DB 实例（用于复杂的 JOIN 查询）
+func (r *ExamRecordRepository) DB() *gorm.DB {
+	return r.db
+}
+
 func (r *ExamRecordRepository) Update(ctx context.Context, rec *entity.ExamRecord) error {
 	return r.db.WithContext(ctx).Save(rec).Error
 }
