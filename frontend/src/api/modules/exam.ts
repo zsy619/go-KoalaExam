@@ -31,9 +31,9 @@ export const examApi = {
   // 考试记录管理
   listRecordsByExam: (examId: number, page: number, pageSize: number) =>
     request({ url: `/exams/${examId}/records`, method: 'GET', params: { page, page_size: pageSize } }),
-  listRecords: (params: any) => request({ url: '/exam-records/mine', method: 'GET', params }),
+  listRecords: (params: any) => request({ url: '/admin/exam-records', method: 'GET', params }),
   getRecord: (id: number) => request({ url: `/exam-records/${id}`, method: 'GET' }),
 
   // 主观题批改
-  gradeSubjective: (data: any) => request({ url: '/grading/subjective', method: 'POST', data }),
+  gradeSubjective: (data: any) => request({ url: '/grading/subjective/batch', method: 'POST', data }),
 }
