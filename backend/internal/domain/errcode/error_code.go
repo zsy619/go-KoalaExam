@@ -13,6 +13,7 @@ const (
 	CodeNotFound       Code = 100004
 	CodeInternal       Code = 100005
 	CodeTooManyRequest Code = 100006
+	CodeInvalidParam   Code = 100007
 
 	CodeUserNotExist      Code = 200001
 	CodeUserPasswordWrong Code = 200002
@@ -20,6 +21,7 @@ const (
 	CodeTokenExpired      Code = 200004
 	CodeTokenInvalid      Code = 200005
 	CodePermissionDenied  Code = 200006
+	CodePasswordWeak      Code = 200007
 
 	CodeQuestionNotExist Code = 300001
 	CodeQuestionEmpty    Code = 300002
@@ -53,6 +55,10 @@ func Message(c Code) string {
 		return "服务器内部错误"
 	case CodeTooManyRequest:
 		return "请求过于频繁，请稍后再试"
+	case CodeInvalidParam:
+		return "参数错误"
+	case CodePasswordWeak:
+		return "密码强度不足"
 	case CodeUserNotExist:
 		return "用户不存在"
 	case CodeUserPasswordWrong:
