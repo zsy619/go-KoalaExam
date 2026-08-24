@@ -23,6 +23,11 @@ func (r *ExamRepository) Update(ctx context.Context, e *entity.Exam) error {
 	return r.db.WithContext(ctx).Save(e).Error
 }
 
+// UpdateFields 按字段更新（只更新传入字段，保留 created_at 等不可变字段）
+func (r *ExamRepository) UpdateFields(ctx context.Context, id int64, fields map[string]interface{}) error {
+	return r.db.WithContext(ctx).Model(&entity.Exam{}).Where("id = ?", id).Updates(fields).Error
+}
+
 func (r *ExamRepository) Delete(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Delete(&entity.Exam{}, id).Error
 }

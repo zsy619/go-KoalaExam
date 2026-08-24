@@ -19,7 +19,18 @@ func (r *PaperRepository) Create(ctx context.Context, p *entity.Paper) error {
 }
 
 func (r *PaperRepository) Update(ctx context.Context, p *entity.Paper) error {
-	return r.db.WithContext(ctx).Save(p).Error
+	// 使用 map 避免 GORM 零值陷阱（特别是时间字段）
+	return r.db.WithContext(ctx).Model(p).Updates(map[string]interface{}{
+		"title":        p.Title,
+		"description":  p.Description,
+		"strategy":     p.Strategy,
+		"total_score":  p.TotalScore,
+		"duration":     p.Duration,
+		"pass_score":   p.PassScore,
+		"status":       p.Status,
+		"question_ids": p.QuestionIDs,
+		"config_rule":  p.ConfigRule,
+	}).Error
 }
 
 func (r *PaperRepository) Delete(ctx context.Context, id int64) error {

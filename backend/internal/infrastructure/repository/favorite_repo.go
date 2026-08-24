@@ -5,6 +5,8 @@ import (
 
 	"gorm.io/gorm"
 
+	domRepo "github.com/your-team/koala-exam-backend/internal/domain/repository"
+
 	"github.com/your-team/koala-exam-backend/internal/domain/entity"
 )
 
@@ -111,7 +113,7 @@ func (r *WrongLogRepository) Upsert(ctx context.Context, log *entity.WrongAnswer
 }
 
 // ListByUser 分页查询错题
-func (r *WrongLogRepository) ListByUser(ctx context.Context, userID int64, page, size int, masteryLevel int8) ([]entity.WrongAnswerLog, int64, error) {
+func (r *WrongLogRepository) ListByUser(ctx context.Context, userID int64, page, size int, masteryLevel int8, reviewed *bool) ([]entity.WrongAnswerLog, int64, error) {
 	var list []entity.WrongAnswerLog
 	var total int64
 	q := r.db.WithContext(ctx).Model(&entity.WrongAnswerLog{}).Where("user_id = ?", userID)
@@ -169,4 +171,65 @@ func (r *FolderRepository) GetOrCreateSystemFolder(ctx context.Context, userID i
 		return nil, err
 	}
 	return &f, nil
+}
+
+
+// Toggle 切换收藏：已存在则删除，否则添加
+func (r *FavoriteRepository) Toggle(ctx context.Context, uid, targetID int64, targetType int8, folderID int64) (bool, error) {
+	var existing entity.Favorite
+	err := r.db.WithContext(ctx).Where("user_id = ? AND target_type = ? AND target_id = ?", uid, targetType, targetID).First(&existing).Error
+	if err == nil {
+		// 已存在，删除
+		if delErr := r.db.WithContext(ctx).Delete(&existing).Error; delErr != nil {
+			return false, delErr
+		}
+		return false, nil
+	}
+	// 不存在，添加
+	fav := &entity.Favorite{
+		UserID:     uid,
+		TargetType: targetType,
+		TargetID:   targetID,
+	}
+	if err := r.db.WithContext(ctx).Create(fav).Error; err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// List 分页查询（实现接口）
+func (r *FavoriteRepository) List(ctx context.Context, filter domRepo.FavoriteListFilter) ([]entity.Favorite, error) {
+	var favs []entity.Favorite
+	q := r.db.WithContext(ctx).Model(&entity.Favorite{})
+	if filter.UserID > 0 {
+		q = q.Where("user_id = ?", filter.UserID)
+	}
+	if filter.TargetType > 0 {
+		q = q.Where("target_type = ?", filter.TargetType)
+	}
+	if filter.FolderID > 0 {
+		q = q.Where("folder_id = ?", filter.FolderID)
+	}
+	if filter.TargetID > 0 {
+		q = q.Where("target_id = ?", filter.TargetID)
+	}
+	if err := q.Order("id DESC").Find(&favs).Error; err != nil {
+		return nil, err
+	}
+	return favs, nil
+}
+
+// CountByUser 统计用户收藏数
+func (r *FavoriteRepository) CountByUser(ctx context.Context, uid int64) (int64, error) {
+	var n int64
+	err := r.db.WithContext(ctx).Model(&entity.Favorite{}).Where("user_id = ?", uid).Count(&n).Error
+	return n, err
+}
+
+
+// CountByUser 统计用户错题数。
+func (r *WrongLogRepository) CountByUser(ctx context.Context, userID int64) (int64, error) {
+	var n int64
+	err := r.db.WithContext(ctx).Model(&entity.WrongAnswerLog{}).Where("user_id = ?", userID).Count(&n).Error
+	return n, err
 }

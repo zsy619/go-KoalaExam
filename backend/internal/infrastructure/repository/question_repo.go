@@ -91,7 +91,13 @@ func (r *CategoryRepository) Create(ctx context.Context, c *entity.QuestionCateg
 }
 
 func (r *CategoryRepository) Update(ctx context.Context, c *entity.QuestionCategory) error {
-	return r.db.WithContext(ctx).Save(c).Error
+	// 使用 map 更新避免 GORM 零值陷阱（特别是 created_at）
+	return r.db.WithContext(ctx).Model(c).Updates(map[string]interface{}{
+		"parent_id": c.ParentID,
+		"name":      c.Name,
+		"code":      c.Code,
+		"sort":      c.Sort,
+	}).Error
 }
 
 func (r *CategoryRepository) Delete(ctx context.Context, id int64) error {

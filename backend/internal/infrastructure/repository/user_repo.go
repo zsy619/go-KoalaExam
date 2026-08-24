@@ -16,7 +16,7 @@ import (
 // UserRepository 用户仓储实现。
 //
 // 编译期断言：实现 domain/repository.UserRepository 接口。
-var _ domRepo.UserRepository = (*UserRepository)(nil)
+var _ domRepo.IUserRepository = (*UserRepository)(nil)
 
 // UserRepository GORM 实现。
 type UserRepository struct {
