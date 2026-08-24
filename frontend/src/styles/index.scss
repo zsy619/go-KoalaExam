@@ -1,0 +1,13 @@
+@use './reset.scss';
+@use './variables.scss' as *;
+
+.koala-card {
+  background: #fff;
+  border-radius: $radius;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.06);
+  padding: 20px;
+}
+
+.koala-page {
+  padding: 20px;
+}
