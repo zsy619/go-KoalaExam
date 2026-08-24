@@ -20,7 +20,8 @@ import (
 	"github.com/your-team/koala-exam-backend/internal/domain/consts"
 	"github.com/your-team/koala-exam-backend/internal/domain/entity"
 	"github.com/your-team/koala-exam-backend/internal/domain/errcode"
-	"github.com/your-team/koala-exam-backend/internal/domain/repository"
+	"github.com/your-team/koala-exam-backend/internal/domain/event"
+	infra "github.com/your-team/koala-exam-backend/internal/infrastructure/repository"
 	"github.com/your-team/koala-exam-backend/internal/infrastructure/cache"
 	"github.com/your-team/koala-exam-backend/pkg/encrypt"
 )
@@ -33,20 +34,22 @@ type PaperAssembler interface {
 
 // ExamApp 考试应用服务。
 type ExamApp struct {
-	exams   repository.ExamRepository
-	records repository.ExamRecordRepository
+	exams   *infra.ExamRepository
+	records *infra.ExamRecordRepository
 	papers  PaperAssembler
 	rdb     *redis.Client
+	bus     *event.Bus
 }
 
 // NewExamApp 构造考试应用服务（依赖注入）。
 func NewExamApp(
-	exams repository.ExamRepository,
-	records repository.ExamRecordRepository,
+	exams *infra.ExamRepository,
+	records *infra.ExamRecordRepository,
 	papers PaperAssembler,
 	rdb *redis.Client,
+	bus *event.Bus,
 ) *ExamApp {
-	return &ExamApp{exams: exams, records: records, papers: papers, rdb: rdb}
+	return &ExamApp{exams: exams, records: records, papers: papers, rdb: rdb, bus: bus}
 }
 
 // CreateExam 创建考试。
@@ -62,8 +65,8 @@ func (a *ExamApp) CreateExam(ctx context.Context, req *dto.CreateExamReq, creato
 }
 
 // ListExams 分页查询考试。
-func (a *ExamApp) ListExams(ctx context.Context, filter repository.ExamListFilter) ([]entity.Exam, int64, error) {
-	return a.exams.List(ctx, filter)
+func (a *ExamApp) ListExams(ctx context.Context, page, size int, status int8, keyword string) ([]entity.Exam, int64, error) {
+	return a.exams.List(ctx, page, size, status, keyword)
 }
 
 // ListAvailableExams 学员可参加的考试列表。
@@ -85,9 +88,25 @@ func (a *ExamApp) UpdateExam(ctx context.Context, id int64, req *dto.CreateExamR
 	if err := req.Validate(); err != nil {
 		return err
 	}
-	exam := buildExam(req, 0)
-	exam.ID = id
-	return a.exams.Update(ctx, exam)
+	tu, _ := json.Marshal(req.TargetUsers)
+	tc, _ := json.Marshal(req.TargetClasses)
+	parsed, _ := req.Parse()
+
+	// 用 Updates 而非 Save：只更新可变字段，不动 created_at/status
+	return a.exams.UpdateFields(ctx, id, map[string]interface{}{
+		"title":          req.Title,
+		"description":    req.Description,
+		"paper_id":       req.PaperID,
+		"start_time":     parsed.Start,
+		"end_time":       parsed.End,
+		"duration":       req.Duration,
+		"max_attempts":   req.MaxAttempts,
+		"shuffle_q":      req.ShuffleQ,
+		"shuffle_opt":    req.ShuffleOpt,
+		"anti_cheat":     req.AntiCheat,
+		"target_users":   string(tu),
+		"target_classes": string(tc),
+	})
 }
 
 // DeleteExam 软删除考试。
@@ -142,11 +161,10 @@ func (a *ExamApp) SaveAnswer(ctx context.Context, req *dto.SaveAnswerReq) error 
 
 // AuditEvent 记录考试行为（切屏/复制粘贴）。
 func (a *ExamApp) AuditEvent(ctx context.Context, req *dto.AuditReq) error {
-	rec, err := a.records.GetByID(ctx, req.RecordID)
+	record, err := a.records.GetByID(ctx, req.RecordID)
 	if err != nil {
 		return errcode.New(errcode.CodeNotFound, "RecordNotFound")
 	}
-	record := rec.(*entity.ExamRecord)
 
 	if ev, ok := req.Events["type"].(string); ok && ev == "tab_switch" {
 		record.TabSwitchCnt++
@@ -157,11 +175,10 @@ func (a *ExamApp) AuditEvent(ctx context.Context, req *dto.AuditReq) error {
 
 // SubmitExam 交卷：合并 Redis 数据 → 更新状态 → 触发自动批改（由 handler 编排）。
 func (a *ExamApp) SubmitExam(ctx context.Context, recordID int64) (*entity.ExamRecord, error) {
-	rec, err := a.records.GetByID(ctx, recordID)
+	record, err := a.records.GetByID(ctx, recordID)
 	if err != nil {
 		return nil, errcode.New(errcode.CodeNotFound, "RecordNotFound")
 	}
-	record := rec.(*entity.ExamRecord)
 
 	if record.Status != consts.RecordStatusOngoing {
 		return nil, errcode.New(errcode.CodeExamSubmitted, "ExamSubmitted")
@@ -198,20 +215,16 @@ func (a *ExamApp) ListRecordsByExam(ctx context.Context, examID int64, page, siz
 
 // ListRecordsByUser 查询学员的所有记录（分页）。
 func (a *ExamApp) ListRecordsByUser(ctx context.Context, uid int64, page, size int) ([]entity.ExamRecord, int64, error) {
-	filter := repository.ExamRecordListFilter{
-		PageQuery: repository.PageQuery{Page: page, Size: size},
-		UserID:    uid,
-	}
-	return a.records.ListByUser(ctx, filter)
+	return a.records.ListByUser(ctx, uid, page, size)
 }
 
 // GetRecord 查询单条考试记录。
 func (a *ExamApp) GetRecord(ctx context.Context, id int64) (*entity.ExamRecord, error) {
-	rec, err := a.records.GetByID(ctx, id)
+	record, err := a.records.GetByID(ctx, id)
 	if err != nil {
 		return nil, errcode.New(errcode.CodeNotFound, "RecordNotFound")
 	}
-	return rec.(*entity.ExamRecord), nil
+	return record, nil
 }
 
 // ============================================================
@@ -235,7 +248,7 @@ func (a *ExamApp) getRunningExam(ctx context.Context, examID int64) (*entity.Exa
 func (a *ExamApp) getOrCreateRecord(ctx context.Context, exam *entity.Exam, userID int64) (*entity.ExamRecord, error) {
 	existing, err := a.records.GetByExamAndUser(ctx, exam.ID, userID)
 	if err == nil && existing != nil {
-		record := existing.(*entity.ExamRecord)
+		record := existing
 		if record.Status != consts.RecordStatusOngoing {
 			return nil, errcode.New(errcode.CodeExamSubmitted, "ExamSubmitted")
 		}
@@ -325,7 +338,7 @@ func buildStartResp(exam *entity.Exam, record *entity.ExamRecord, questions []en
 		RecordID:  record.ID,
 		Title:     exam.Title,
 		Duration:  exam.Duration,
-		Questions: questions,
+		Questions: convertQuestions(questions),
 		StartTime: exam.StartTime.Format(time.RFC3339),
 		EndTime:   exam.EndTime.Format(time.RFC3339),
 		ShuffleQ:  exam.ShuffleQ,
@@ -355,3 +368,22 @@ func encodeJSON(v interface{}) string {
 
 // ptrTime 返回 *time.Time。
 func ptrTime(t time.Time) *time.Time { return &t }
+
+
+// convertQuestions 转换题目列表为响应。
+func convertQuestions(qs []entity.Question) []dto.QuestionResp {
+	resps := make([]dto.QuestionResp, 0, len(qs))
+	for i := range qs {
+		resps = append(resps, dto.QuestionResp{
+			ID:         qs[i].ID,
+			Type:       qs[i].Type,
+			Difficulty: qs[i].Difficulty,
+			Title:      qs[i].Title,
+			Analysis:   qs[i].Analysis,
+			Score:      qs[i].Score,
+		})
+	}
+	return resps
+}
+
+

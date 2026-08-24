@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/your-team/koala-exam-backend/internal/application/dto"
 	"github.com/your-team/koala-exam-backend/internal/application/exam"
@@ -45,9 +44,7 @@ func (a *GradingApp) AutoGrade(ctx context.Context, recordID int64) (*entity.Exa
 	}
 
 	var objective float64
-	wrongItems := []favorite.WrongItem{}
-	now := time.Now()
-
+	wrongItems := []int64{}
 	for _, q := range qs {
 		if !consts.IsObjective(q.Type) {
 			continue
@@ -58,12 +55,7 @@ func (a *GradingApp) AutoGrade(ctx context.Context, recordID int64) (*entity.Exa
 		if correct {
 			objective += q.Score
 		} else {
-			wrongItems = append(wrongItems, favorite.WrongItem{
-				QuestionID:        q.ID,
-				UserAnswerText:    fmt.Sprintf("%v", userAns),
-				CorrectAnswerText: fmt.Sprintf("%v", correctAns),
-				Now:               now,
-			})
+			wrongItems = append(wrongItems, q.ID)
 		}
 		// 题库统计
 		_ = a.qRepo.IncStat(ctx, q.ID, correct)
@@ -81,7 +73,7 @@ func (a *GradingApp) AutoGrade(ctx context.Context, recordID int64) (*entity.Exa
 
 	// 自动收录错题
 	if len(wrongItems) > 0 {
-		_ = a.favApp.RecordWrongAnswers(ctx, rec.UserID, rec.ExamID, rec.ID, wrongItems)
+		_ = a.favApp.RecordWrongAnswers(ctx, rec.UserID, wrongItems)
 	}
 
 	return rec, nil

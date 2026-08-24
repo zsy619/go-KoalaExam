@@ -113,6 +113,17 @@ func (a *QuestionApp) CreateCategory(ctx context.Context, c *entity.QuestionCate
 	return a.catRepo.Create(ctx, c)
 }
 
+
+// UpdateCategory 更新分类。
+func (a *QuestionApp) UpdateCategory(ctx context.Context, cat *entity.QuestionCategory) error {
+	return a.catRepo.Update(ctx, cat)
+}
+
+// DeleteCategory 删除分类。
+func (a *QuestionApp) DeleteCategory(ctx context.Context, id int64) error {
+	return a.catRepo.Delete(ctx, id)
+}
+
 // toResp 转换为响应 DTO（学员端隐藏答案）
 func toResp(q *entity.Question, withAnswer bool) *dto.QuestionResp {
 	var opts []dto.QuestionOption

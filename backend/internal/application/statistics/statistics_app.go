@@ -37,15 +37,30 @@ type ExamOverview struct {
 func (a *StatisticsApp) ExamOverview(ctx context.Context, examID int64) (*ExamOverview, error) {
 	overview := &ExamOverview{ExamID: examID, ScoreRange: map[string]int64{"0-59": 0, "60-69": 0, "70-79": 0, "80-89": 0, "90-100": 0}}
 	type row struct {
-		Avg, Max, Min float64
-		Cnt, Passed   int64
+		Avg    float64
+		Max    float64
+		Min    float64
+		Cnt    int64
+		Passed int64
+	}
+	type rowRaw struct {
+		Avgv   float64
+		Maxv   float64
+		Minv   float64
+		Cnt    int64
+		Passed int64
 	}
 	var r row
+	var r_new rowRaw
 	err := a.db.WithContext(ctx).
-		Model(struct{}{}). // 表模型将在 repository 中处理
-		Where("exam_id = ? AND status = 2", examID).
-		Select("AVG(total_score) AS avg, MAX(total_score) AS max, MIN(total_score) AS min, COUNT(*) AS cnt, SUM(CASE WHEN passed=1 THEN 1 ELSE 0 END) AS passed").
-		Scan(&r).Error
+		Raw("SELECT AVG(total_score) AS avgv, MAX(total_score) AS maxv, MIN(total_score) AS minv, COUNT(*) AS cnt, SUM(CASE WHEN passed=1 THEN 1 ELSE 0 END) AS passed FROM ke_exam_record WHERE exam_id = ? AND status = 2", examID).
+		Scan(&r_new).Error
+	if err != nil { return nil, err }
+	r.Avg = r_new.Avgv
+	r.Max = r_new.Maxv
+	r.Min = r_new.Minv
+	r.Cnt = r_new.Cnt
+	r.Passed = r_new.Passed
 	if err != nil { return nil, err }
 	overview.AvgScore = r.Avg
 	overview.MaxScore = r.Max

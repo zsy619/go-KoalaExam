@@ -36,6 +36,8 @@ func (a *PaperApp) Create(ctx context.Context, req *dto.CreatePaperReq, creatorI
 		}
 		ids, _ := json.Marshal(req.QuestionIDs)
 		p.QuestionIDs = string(ids)
+		// 初始化 ConfigRule 为合法 JSON
+		p.ConfigRule = "{}"
 	case consts.StrategyRandom, consts.StrategyGA:
 		cfg, _ := json.Marshal(req.ConfigRule)
 		p.ConfigRule = string(cfg)
@@ -122,6 +124,68 @@ func (a *PaperApp) GetDetail(ctx context.Context, id int64) (*entity.Paper, []en
 // List
 func (a *PaperApp) List(ctx context.Context, page, size int, keyword string) ([]entity.Paper, int64, error) {
 	return a.paperRepo.List(ctx, page, size, keyword)
+}
+
+
+// Update 更新试卷（含题目绑定）
+func (a *PaperApp) Update(ctx context.Context, id int64, req *dto.CreatePaperReq) error {
+	// 检查试卷是否存在
+	existing, err := a.paperRepo.GetByID(ctx, id)
+	if err != nil {
+		return errcode.New(errcode.CodePaperNotExist, "PaperNotExist")
+	}
+
+	// 更新基础字段
+	existing.Title = req.Title
+	existing.Description = req.Description
+	existing.Strategy = req.Strategy
+	existing.TotalScore = req.TotalScore
+	existing.Duration = req.Duration
+	existing.PassScore = req.PassScore
+
+	switch req.Strategy {
+	case consts.StrategyFixed:
+		if len(req.QuestionIDs) == 0 {
+			return errcode.New(errcode.CodeQuestionEmpty, "QuestionEmpty")
+		}
+		ids, _ := json.Marshal(req.QuestionIDs)
+		existing.QuestionIDs = string(ids)
+		// 清空 ConfigRule（使用合法 JSON 避免 MySQL JSON 列错误）
+		existing.ConfigRule = "{}"
+	case consts.StrategyRandom, consts.StrategyGA:
+		cfg, _ := json.Marshal(req.ConfigRule)
+		existing.ConfigRule = string(cfg)
+		// 清空 QuestionIDs（使用合法 JSON 避免 MySQL JSON 列错误）
+		existing.QuestionIDs = "[]"
+	}
+
+	if err := a.paperRepo.Update(ctx, existing); err != nil {
+		return err
+	}
+
+	// 固定策略：重新绑定题目
+	if req.Strategy == consts.StrategyFixed && len(req.QuestionIDs) > 0 {
+		items := make([]entity.PaperQuestion, 0, len(req.QuestionIDs))
+		qs, _ := a.qRepo.ListByIDs(ctx, req.QuestionIDs)
+		qmap := map[int64]entity.Question{}
+		for _, q := range qs {
+			qmap[q.ID] = q
+		}
+		for i, qid := range req.QuestionIDs {
+			score := 1.0
+			if q, ok := qmap[qid]; ok && q.Score > 0 {
+				score = q.Score
+			}
+			items = append(items, entity.PaperQuestion{
+				PaperID: id, QuestionID: qid, Sort: i, Score: score,
+			})
+		}
+		if err := a.paperRepo.AddQuestions(ctx, id, items); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Delete
