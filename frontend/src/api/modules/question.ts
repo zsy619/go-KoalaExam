@@ -1,3 +1,14 @@
+export interface Category {
+  id: number
+  parent_id: number
+  name: string
+  code?: string
+  sort: number
+  creator_id?: number
+  created_at?: string
+  updated_at?: string
+}
+
 import request from '@/api'
 import type { Question } from '@/types/entity'
 
@@ -10,8 +21,8 @@ export const questionApi = {
   remove: (id: number) => request({ url: `/questions/${id}`, method: 'DELETE' }),
 
   // 分类管理（CRUD）
-  listCategories: () => request({ url: '/question-categories', method: 'GET' }),
-  categories: () => request({ url: '/question-categories', method: 'GET' }),
+  listCategories: () => request<Category[]>({ url: '/question-categories', method: 'GET' }),
+  categories: () => request<Category[]>({ url: '/question-categories', method: 'GET' }),
   createCategory: (data: any) => request({ url: '/question-categories', method: 'POST', data }),
   updateCategory: (id: number, data: any) => request({ url: `/question-categories/${id}`, method: 'PUT', data }),
   deleteCategory: (id: number) => request({ url: `/question-categories/${id}`, method: 'DELETE' }),

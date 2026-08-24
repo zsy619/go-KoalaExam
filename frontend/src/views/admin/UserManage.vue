@@ -7,7 +7,7 @@ import { userApi } from '@/api/modules/user'
 const list = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)
-const query = ref({ page: 1, page_size: 20, role: 0, keyword: '' })
+const query = ref({ page: 1, page_size: 15, role: 0, keyword: '' })
 
 // 创建/编辑对话框
 const dialogVisible = ref(false)
@@ -193,7 +193,7 @@ onMounted(fetchList)
           v-model:current-page="query.page"
           v-model:page-size="query.page_size"
           :total="total"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="[15, 30, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           background
           @current-change="fetchList"

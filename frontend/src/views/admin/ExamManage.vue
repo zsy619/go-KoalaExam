@@ -12,7 +12,7 @@ const loading = ref(false)
 const papers = ref<any[]>([])
 const students = ref<any[]>([])
 
-const query = reactive({ page: 1, page_size: 10, keyword: '', status: -1 })
+const query = reactive({ page: 1, page_size: 15, keyword: '', status: -1 })
 const currentPage = computed({
   get: () => query.page,
   set: (v: number) => { query.page = v }
@@ -311,7 +311,7 @@ onMounted(() => { fetchPapers(); fetchStudents(); fetchList() })
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
           :total="total"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="[15, 30, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           background
           @current-change="handlePageChange"

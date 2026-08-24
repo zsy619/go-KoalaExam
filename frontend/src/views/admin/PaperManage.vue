@@ -80,7 +80,7 @@
         v-model:page-size="query.page_size"
         :total="total"
         layout="total, sizes, prev, pager, next, jumper"
-        :page-sizes="[10, 20, 50]"
+        :page-sizes="[15, 30, 50, 100]"
         @current-change="fetchList"
         @size-change="fetchList"
         style="margin-top: 16px; justify-content: flex-end;"
@@ -386,7 +386,7 @@ const list = ref<any[]>([])
 const total = ref(0)
 const query = ref({
   page: 1,
-  page_size: 10,
+  page_size: 15,
   keyword: '',
   strategy: 0,
 })

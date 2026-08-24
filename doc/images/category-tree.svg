@@ -1,0 +1,121 @@
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="500" fill="#f0f2f5"/>
+  <rect x="0" y="0" width="220" height="500" fill="#001529"/>
+  <text x="20" y="30" font-size="16" fill="#fff" font-weight="600">🐨 KoalaExam</text>
+  <text x="40" y="135" font-size="13" fill="#fff" opacity="0.65">📊 数据看板</text>
+  <rect x="0" y="160" width="220" height="40" fill="#1890ff"/>
+  <text x="40" y="185" font-size="14" fill="#fff">📚 题库管理</text>
+  <text x="40" y="225" font-size="13" fill="#fff" opacity="0.65">📝 试卷管理</text>
+  <text x="40" y="265" font-size="13" fill="#fff" opacity="0.65">📅 考试管理</text>
+  
+  <!-- 顶部统计卡 -->
+  <rect x="240" y="20" width="130" height="60" rx="6" fill="#fff"/>
+  <rect x="240" y="20" width="4" height="60" fill="#409eff"/>
+  <text x="250" y="45" font-size="20" font-weight="700" fill="#303133">8</text>
+  <text x="250" y="65" font-size="11" fill="#909399">总分类数</text>
+  
+  <rect x="380" y="20" width="130" height="60" rx="6" fill="#fff"/>
+  <rect x="380" y="20" width="4" height="60" fill="#67c23a"/>
+  <text x="390" y="45" font-size="20" font-weight="700" fill="#303133">6</text>
+  <text x="390" y="65" font-size="11" fill="#909399">顶级分类</text>
+  
+  <rect x="520" y="20" width="130" height="60" rx="6" fill="#fff"/>
+  <rect x="520" y="20" width="4" height="60" fill="#e6a23c"/>
+  <text x="530" y="45" font-size="20" font-weight="700" fill="#303133">2</text>
+  <text x="530" y="65" font-size="11" fill="#909399">子分类</text>
+  
+  <rect x="660" y="20" width="120" height="60" rx="6" fill="#fff"/>
+  <rect x="660" y="20" width="4" height="60" fill="#909399"/>
+  <text x="670" y="45" font-size="20" font-weight="700" fill="#303133">1326</text>
+  <text x="670" y="65" font-size="11" fill="#909399">题目总数</text>
+  
+  <!-- 树形 -->
+  <rect x="240" y="100" width="540" height="380" rx="4" fill="#fff"/>
+  <text x="260" y="125" font-size="14" font-weight="600" fill="#303133">📁 题目分类管理</text>
+  <rect x="580" y="108" width="200" height="28" rx="3" fill="#f5f7fa" stroke="#dcdfe6"/>
+  <text x="595" y="125" font-size="12" fill="#909399">🔍 搜索分类...</text>
+  
+  <!-- 树节点 1 -->
+  <text x="260" y="160" font-size="14" fill="#e6a23c">▼</text>
+  <text x="280" y="160" font-size="13">📂</text>
+  <text x="300" y="160" font-size="13" font-weight="600" fill="#303133">计算机基础</text>
+  <rect x="385" y="148" width="35" height="16" rx="8" fill="#f4f4f5"/>
+  <text x="402" y="159" text-anchor="middle" font-size="10" fill="#606266">2</text>
+  <rect x="425" y="148" width="60" height="16" rx="2" fill="#409eff"/>
+  <text x="455" y="159" text-anchor="middle" font-size="10" fill="#fff">CS-BASIC</text>
+  <text x="500" y="160" font-size="11" fill="#909399">#1</text>
+  <rect x="525" y="148" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="555" y="159" text-anchor="middle" font-size="10" fill="#67c23a">📄 285</text>
+  
+  <!-- 子节点 1.1 -->
+  <line x1="265" y1="170" x2="265" y2="200" stroke="#dcdfe6"/>
+  <line x1="265" y1="200" x2="280" y2="200" stroke="#dcdfe6"/>
+  <text x="282" y="203" font-size="14" fill="#909399">▶</text>
+  <text x="305" y="203" font-size="13">📁</text>
+  <text x="322" y="203" font-size="13" fill="#303133">数据结构</text>
+  <text x="525" y="203" font-size="11" fill="#909399">#1</text>
+  <rect x="525" y="191" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="555" y="202" text-anchor="middle" font-size="10" fill="#67c23a">📄 142</text>
+  
+  <!-- 子节点 1.2 -->
+  <line x1="265" y1="170" x2="265" y2="235" stroke="#dcdfe6"/>
+  <line x1="265" y1="235" x2="280" y2="235" stroke="#dcdfe6"/>
+  <text x="282" y="238" font-size="14" fill="#909399">▶</text>
+  <text x="305" y="238" font-size="13">📁</text>
+  <text x="322" y="238" font-size="13" fill="#303133">操作系统</text>
+  <text x="525" y="238" font-size="11" fill="#909399">#2</text>
+  <rect x="525" y="226" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="555" y="237" text-anchor="middle" font-size="10" fill="#67c23a">📄 143</text>
+  
+  <!-- 树节点 2 -->
+  <text x="260" y="280" font-size="14" fill="#e6a23c">▼</text>
+  <text x="280" y="280" font-size="13">📂</text>
+  <text x="300" y="280" font-size="13" font-weight="600" fill="#303133">前端开发</text>
+  <rect x="385" y="268" width="35" height="16" rx="8" fill="#f4f4f5"/>
+  <text x="402" y="279" text-anchor="middle" font-size="10" fill="#606266">3</text>
+  <rect x="425" y="268" width="35" height="16" rx="2" fill="#409eff"/>
+  <text x="442" y="279" text-anchor="middle" font-size="10" fill="#fff">FE</text>
+  <text x="475" y="280" font-size="11" fill="#909399">#2</text>
+  <rect x="500" y="268" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="530" y="279" text-anchor="middle" font-size="10" fill="#67c23a">📄 318</text>
+  
+  <!-- 树节点 3 -->
+  <text x="260" y="320" font-size="14" fill="#e6a23c">▶</text>
+  <text x="280" y="320" font-size="13">📂</text>
+  <text x="300" y="320" font-size="13" font-weight="600" fill="#303133">后端开发</text>
+  <rect x="425" y="308" width="35" height="16" rx="2" fill="#409eff"/>
+  <text x="442" y="319" text-anchor="middle" font-size="10" fill="#fff">BE</text>
+  <text x="475" y="320" font-size="11" fill="#909399">#3</text>
+  <rect x="500" y="308" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="530" y="319" text-anchor="middle" font-size="10" fill="#67c23a">📄 256</text>
+  
+  <!-- 树节点 4 -->
+  <text x="260" y="360" font-size="14" fill="#e6a23c">▶</text>
+  <text x="280" y="360" font-size="13">📂</text>
+  <text x="300" y="360" font-size="13" font-weight="600" fill="#303133">算法与数据结构</text>
+  <rect x="425" y="348" width="50" height="16" rx="2" fill="#409eff"/>
+  <text x="450" y="359" text-anchor="middle" font-size="10" fill="#fff">ALGO</text>
+  <text x="485" y="360" font-size="11" fill="#909399">#4</text>
+  <rect x="510" y="348" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="540" y="359" text-anchor="middle" font-size="10" fill="#67c23a">📄 198</text>
+  
+  <!-- 树节点 5 -->
+  <text x="260" y="400" font-size="14" fill="#e6a23c">▶</text>
+  <text x="280" y="400" font-size="13">📂</text>
+  <text x="300" y="400" font-size="13" font-weight="600" fill="#303133">数据库</text>
+  <rect x="385" y="388" width="65" height="16" rx="2" fill="#409eff"/>
+  <text x="417" y="399" text-anchor="middle" font-size="10" fill="#fff">DATABASE</text>
+  <text x="460" y="400" font-size="11" fill="#909399">#5</text>
+  <rect x="485" y="388" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="515" y="399" text-anchor="middle" font-size="10" fill="#67c23a">📄 145</text>
+  
+  <!-- 树节点 6 -->
+  <text x="260" y="440" font-size="14" fill="#e6a23c">▶</text>
+  <text x="280" y="440" font-size="13">📂</text>
+  <text x="300" y="440" font-size="13" font-weight="600" fill="#303133">网络与安全</text>
+  <rect x="395" y="428" width="35" height="16" rx="2" fill="#409eff"/>
+  <text x="412" y="439" text-anchor="middle" font-size="10" fill="#fff">NET</text>
+  <text x="445" y="440" font-size="11" fill="#909399">#6</text>
+  <rect x="470" y="428" width="60" height="16" rx="8" fill="#f0f9ff"/>
+  <text x="500" y="439" text-anchor="middle" font-size="10" fill="#67c23a">📄 124</text>
+</svg>

@@ -42,8 +42,11 @@ instance.interceptors.response.use(
   }
 )
 
-export const request = <T = unknown>(config: AxiosRequestConfig): Promise<BaseResp<T>> => {
-  return instance.request<BaseResp<T>>(config) as unknown as Promise<BaseResp<T>>
+export const request = <T = unknown>(config: AxiosRequestConfig): Promise<T> => {
+  return instance.request<BaseResp<T>>(config).then((resp: any) => {
+    // 拦截器已经解包 data.data，这里确保返回 T
+    return resp?.data?.data !== undefined ? resp.data.data : (resp?.data ?? resp)
+  }) as unknown as Promise<T>
 }
 
 export default request

@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 const list = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)
-const query = ref({ page: 1, page_size: 20 })
+const query = ref({ page: 1, page_size: 15 })
 const stats = ref<UserLearningStats | null>(null)
 
 async function fetchList() {

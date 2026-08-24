@@ -47,7 +47,7 @@ const filterExam = ref<number | null>(null)
 const filterStatus = ref<number | null>(null)
 const filterKeyword = ref('')
 const page = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(15)
 const total = ref(0)
 
 function getStatusType(s: number) {
@@ -352,7 +352,7 @@ onMounted(() => {
           v-model:page-size="pageSize"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
-          :page-sizes="[10, 20, 50, 100]"
+          :page-sizes="[15, 30, 50, 100]"
           background
           @current-change="handlePageChange"
           @size-change="handleSizeChange"

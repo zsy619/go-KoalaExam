@@ -9,10 +9,10 @@ const list = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)
 const categories = ref<any[]>([])
-const query = ref({ page: 1, page_size: 20, category_id: 0, type: 0, difficulty: 0, keyword: '' })
+const query = ref({ page: 1, page_size: 15, category_id: 0, type: 0, difficulty: 0, keyword: '' })
 
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(15)
 
 function handlePageChange(p: number) {
   query.value.page = p
@@ -288,7 +288,7 @@ onMounted(() => {
           v-model:current-page="currentPage"
           :page-size="pageSize"
           :total="total"
-          :page-sizes="[10, 20, 50, 100]"
+          :page-sizes="[15, 30, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           background
           @current-change="handlePageChange"
