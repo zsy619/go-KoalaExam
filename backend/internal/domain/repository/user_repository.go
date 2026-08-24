@@ -50,7 +50,7 @@ type UserListFilter struct {
 
 // UserRepository 用户仓储接口
 // 领域层只依赖接口，具体实现在 infrastructure 层
-type UserRepository interface {
+type IUserRepository interface {
 	Create(ctx context.Context, u *entity.User) error
 	Update(ctx context.Context, u *entity.User) error
 	Delete(ctx context.Context, id int64) error

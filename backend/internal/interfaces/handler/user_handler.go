@@ -9,6 +9,7 @@ import (
 	"github.com/your-team/koala-exam-backend/internal/application/dto"
 	"github.com/your-team/koala-exam-backend/internal/application/user"
 	"github.com/your-team/koala-exam-backend/internal/domain/entity"
+	domRepo "github.com/your-team/koala-exam-backend/internal/domain/repository"
 	"github.com/your-team/koala-exam-backend/pkg/response"
 )
 
@@ -23,7 +24,7 @@ func (h *UserHandler) Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	ip := c.ClientIP()
-	resp, err := h.app.Login(ctx, &req, ip)
+	resp, err := h.app.Login(ctx, req.Username, req.Password, ip)
 	if err != nil {
 		response.Fail(c, 401, 200002, err.Error())
 		return
@@ -60,7 +61,12 @@ func (h *UserHandler) List(ctx context.Context, c *app.RequestContext) {
 	size, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
 	role, _ := strconv.Atoi(c.Query("role"))
 	keyword := c.Query("keyword")
-	list, total, err := h.app.ListUsers(ctx, page, size, int8(role), keyword)
+	filter := domRepo.UserListFilter{
+		PageQuery: domRepo.PageQuery{Page: page, Size: size, Keyword: keyword},
+		Role:      int8(role),
+		Status:    -1,
+	}
+	list, total, err := h.app.ListUsers(ctx, filter)
 	if err != nil {
 		response.Fail(c, 500, 100005, err.Error())
 		return
@@ -74,10 +80,12 @@ func (h *UserHandler) Create(ctx context.Context, c *app.RequestContext) {
 		response.Fail(c, 400, 100001, "参数错误")
 		return
 	}
-	if err := h.app.CreateUser(ctx, &u); err != nil {
+	id, err := h.app.CreateUser(ctx, &u, u.Password)
+	if err != nil {
 		response.Fail(c, 500, 100005, err.Error())
 		return
 	}
+	u.ID = id
 	response.Success(c, u)
 }
 
@@ -119,7 +127,7 @@ func (h *UserHandler) UpdateProfile(ctx context.Context, c *app.RequestContext) 
 		return
 	}
 	uid := c.GetInt64("user_id")
-	if err := h.app.UpdateProfile(ctx, uid, req.Nickname, req.Email, req.Phone, req.Avatar); err != nil {
+	if err := h.app.UpdateProfile(ctx, uid, req.Nickname, req.Phone, req.Email); err != nil {
 		response.Fail(c, 500, 100005, err.Error())
 		return
 	}
@@ -135,6 +143,22 @@ func (h *UserHandler) Delete(ctx context.Context, c *app.RequestContext) {
 	response.Success(c, nil)
 }
 
+// Update 管理员更新用户信息。
+func (h *UserHandler) Update(ctx context.Context, c *app.RequestContext) {
+	id := (func() int64 { v, _ := strconv.ParseInt(c.Param("id"), 10, 64); return v })()
+	var u entity.User
+	if err := c.BindAndValidate(&u); err != nil {
+		response.Fail(c, 400, 100001, "参数错误")
+		return
+	}
+	u.ID = id
+	if err := h.app.AdminUpdateUser(ctx, &u); err != nil {
+		response.Fail(c, 500, 100005, err.Error())
+		return
+	}
+	response.Success(c, nil)
+}
+
 func (h *UserHandler) ToggleStatus(ctx context.Context, c *app.RequestContext) {
 	id := (func() int64 { v, _ := strconv.ParseInt(c.Param("id"), 10, 64); return v })()
 	var req struct { Status int8 `json:"status" binding:"required"` }
@@ -142,7 +166,7 @@ func (h *UserHandler) ToggleStatus(ctx context.Context, c *app.RequestContext) {
 		response.Fail(c, 400, 100001, "参数错误")
 		return
 	}
-	if err := h.app.ToggleStatus(ctx, id, req.Status); err != nil {
+	if err := h.app.ChangeStatus(ctx, id, req.Status); err != nil {
 		response.Fail(c, 500, 100005, err.Error())
 		return
 	}
@@ -157,4 +181,18 @@ func (h *UserHandler) GetByID(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	response.Success(c, u)
+}
+
+
+// Logout 登出接口。
+func (h *UserHandler) Logout(ctx context.Context, c *app.RequestContext) {
+	token := c.Query("token")
+	if token == "" {
+		token = c.GetString("token")
+	}
+	if err := h.app.Logout(ctx, token); err != nil {
+		response.Fail(c, 500, 100005, err.Error())
+		return
+	}
+	response.Success(c, nil)
 }

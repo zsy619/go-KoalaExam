@@ -12,7 +12,7 @@ type ExamListFilter struct {
 }
 
 // ExamRepository 考试仓储接口
-type ExamRepository interface {
+type IExamRepository interface {
 	Create(ctx context.Context, e any) error
 	Update(ctx context.Context, e any) error
 	Delete(ctx context.Context, id int64) error

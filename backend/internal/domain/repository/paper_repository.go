@@ -15,7 +15,7 @@ type PaperListFilter struct {
 }
 
 // PaperRepository 试卷仓储接口
-type PaperRepository interface {
+type IPaperRepository interface {
 	Create(ctx context.Context, p *entity.Paper) error
 	Update(ctx context.Context, p *entity.Paper) error
 	Delete(ctx context.Context, id int64) error

@@ -37,6 +37,7 @@ type ExamRecord struct {
 	UserID          int64          `gorm:"index:idx_exam_user,unique;not null" json:"user_id"`
 	PaperSnapshot   string         `gorm:"type:json" json:"paper_snapshot"` // 试卷快照（防止题目被删影响）
 	Answers         string         `gorm:"type:json" json:"answers"`        // 答题内容JSON
+	AuditSummary    string         `gorm:"type:json" json:"audit_summary"`   // 防作弊审计汇总
 	Status          int8           `gorm:"default:0;index" json:"status"`   // 0:进行中 1:已交卷 2:已批改 3:异常
 	StartTime       time.Time      `json:"start_time"`
 	SubmitTime      *time.Time     `json:"submit_time"`

@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -15,6 +16,8 @@ import (
 	"github.com/your-team/koala-exam-backend/internal/application/statistics"
 	"github.com/your-team/koala-exam-backend/internal/application/user"
 	"github.com/your-team/koala-exam-backend/internal/domain/consts"
+	"github.com/your-team/koala-exam-backend/internal/domain/event"
+	"github.com/your-team/koala-exam-backend/internal/infrastructure/cache"
 	"github.com/your-team/koala-exam-backend/internal/infrastructure/repository"
 	"github.com/your-team/koala-exam-backend/internal/interfaces/handler"
 	"github.com/your-team/koala-exam-backend/internal/interfaces/middleware"
@@ -34,12 +37,17 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 	folderRepo := repository.NewFolderRepository(db)
 	wrongRepo := repository.NewWrongLogRepository(db)
 
+	// 初始化事件总线、限流器
+	bus := event.NewBus()
+	loginLimiter := cache.NewRedisLoginLimiter(rdb, 5, 5*time.Minute)
+
 	// 初始化应用服务
-	userApp := user.NewUserApp(userRepo, jwtHelper)
+	tokenSvc := user.NewJwtTokenAdapter(jwtHelper)
+	userApp := user.NewUserApp(userRepo, tokenSvc, bus, loginLimiter)
 	qApp := question.NewQuestionApp(qRepo, catRepo)
 	paperApp := question.NewPaperApp(paperRepo, qRepo)
-	examApp := exam.NewExamApp(examRepo, recordRepo, paperApp, rdb)
-	favApp := favorite.NewFavoriteApp(favRepo, folderRepo, wrongRepo, qApp, qRepo)
+	examApp := exam.NewExamApp(examRepo, recordRepo, paperApp, rdb, bus)
+	favApp := favorite.NewFavoriteApp(db, favRepo, folderRepo, wrongRepo, nil, bus)
 	gradingApp := grading.NewGradingApp(recordRepo, qRepo, examApp, favApp)
 
 	// 初始化 Handler
@@ -67,6 +75,7 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 		// 公开接口
 		v1.POST("/auth/login", userH.Login)
 		v1.POST("/auth/refresh", userH.RefreshToken)
+		v1.POST("/auth/logout", userH.Logout)
 
 		// 鉴权后接口
 		auth := v1.Group("", middleware.Auth(jwtHelper))
@@ -82,6 +91,7 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 		admin.POST("/users/:id/reset-password", userH.ResetPassword)
 
 		admin.GET("/users/:id", userH.GetByID)
+		admin.PUT("/users/:id", userH.Update)
 		admin.PUT("/users/:id/status", userH.ToggleStatus)
 		admin.DELETE("/users/:id", userH.Delete)
 
@@ -95,8 +105,11 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 		ta.POST("/questions/import", qH.BatchImport)
 		ta.GET("/question-categories", qH.ListCategories)
 		ta.POST("/question-categories", qH.CreateCategory)
+		ta.PUT("/question-categories/:id", qH.UpdateCategory)
+		ta.DELETE("/question-categories/:id", qH.DeleteCategory)
 
 		ta.POST("/papers", pH.Create)
+		ta.PUT("/papers/:id", pH.Update)
 		ta.GET("/papers", pH.List)
 		ta.GET("/papers/:id", pH.Get)
 		ta.DELETE("/papers/:id", pH.Delete)
@@ -132,6 +145,8 @@ func RegisterRoutes(h *server.Hertz, db *gorm.DB, rdb *redis.Client, jwtHelper *
 		auth.POST("/favorite-folders", fH.CreateFolder)
 		auth.DELETE("/favorite-folders/:id", fH.DeleteFolder)
 		auth.GET("/wrong-book", fH.GetWrongBook)
+		auth.GET("/wrong-book/distribution", fH.MasteryDistribution)
+		auth.GET("/favorites/stats", fH.GetStats)
 		auth.POST("/wrong-log/:id/reviewed", fH.MarkReviewed)
 	}
 }

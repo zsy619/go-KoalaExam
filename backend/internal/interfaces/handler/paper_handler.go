@@ -31,6 +31,20 @@ func (h *PaperHandler) Create(ctx context.Context, c *app.RequestContext) {
 	response.Success(c, map[string]interface{}{"id": id})
 }
 
+
+func (h *PaperHandler) Update(ctx context.Context, c *app.RequestContext) {
+	id := (func() int64 { v, _ := strconv.ParseInt(c.Param("id"), 10, 64); return v })()
+	var req dto.CreatePaperReq
+	if err := c.BindAndValidate(&req); err != nil {
+		response.Fail(c, 400, 100001, "参数错误")
+		return
+	}
+	if err := h.app.Update(ctx, id, &req); err != nil {
+		response.Fail(c, 500, 100005, err.Error())
+		return
+	}
+	response.Success(c, nil)
+}
 func (h *PaperHandler) Get(ctx context.Context, c *app.RequestContext) {
 	id := (func() int64 { v, _ := strconv.ParseInt(c.Param("id"), 10, 64); return v })()
 	p, qs, err := h.app.GetDetail(ctx, id)

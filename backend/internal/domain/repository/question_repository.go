@@ -17,7 +17,7 @@ type QuestionListFilter struct {
 }
 
 // QuestionRepository 题目仓储接口
-type QuestionRepository interface {
+type IQuestionRepository interface {
 	Create(ctx context.Context, q *entity.Question) error
 	Update(ctx context.Context, q *entity.Question) error
 	Delete(ctx context.Context, id int64) error
@@ -44,7 +44,7 @@ type QuestionRepository interface {
 }
 
 // CategoryRepository 题库分类仓储接口
-type CategoryRepository interface {
+type ICategoryRepository interface {
 	Create(ctx context.Context, c *entity.QuestionCategory) error
 	Update(ctx context.Context, c *entity.QuestionCategory) error
 	Delete(ctx context.Context, id int64) error

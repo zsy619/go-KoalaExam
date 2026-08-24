@@ -118,3 +118,30 @@ func (h *QuestionHandler) CreateCategory(ctx context.Context, c *app.RequestCont
 	}
 	response.Success(c, cat)
 }
+
+
+// UpdateCategory 更新分类。
+func (h *QuestionHandler) UpdateCategory(ctx context.Context, c *app.RequestContext) {
+	id := (func() int64 { v, _ := strconv.ParseInt(c.Param("id"), 10, 64); return v })()
+	var cat entity.QuestionCategory
+	if err := c.BindAndValidate(&cat); err != nil {
+		response.Fail(c, 400, 100001, "参数错误")
+		return
+	}
+	cat.ID = id
+	if err := h.app.UpdateCategory(ctx, &cat); err != nil {
+		response.Fail(c, 500, 100005, err.Error())
+		return
+	}
+	response.Success(c, cat)
+}
+
+// DeleteCategory 删除分类。
+func (h *QuestionHandler) DeleteCategory(ctx context.Context, c *app.RequestContext) {
+	id := (func() int64 { v, _ := strconv.ParseInt(c.Param("id"), 10, 64); return v })()
+	if err := h.app.DeleteCategory(ctx, id); err != nil {
+		response.Fail(c, 500, 100005, err.Error())
+		return
+	}
+	response.Success(c, nil)
+}

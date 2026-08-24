@@ -11,7 +11,7 @@ type FavoriteFolderListFilter struct {
 }
 
 // FavoriteFolderRepository 收藏夹仓储接口
-type FavoriteFolderRepository interface {
+type IFavoriteFolderRepository interface {
 	Create(ctx context.Context, f any) error
 	Update(ctx context.Context, f any) error
 	Delete(ctx context.Context, id int64) error
@@ -22,12 +22,13 @@ type FavoriteFolderRepository interface {
 // FavoriteListFilter 收藏过滤
 type FavoriteListFilter struct {
 	UserID     int64
-	TargetType int8 // 1=题目 2=试卷 3=知识点
+	TargetType int8  // 1=题目 2=试卷 3=知识点
+	TargetID   int64 // 指定目标 ID 时筛选唯一
 	FolderID   int64
 }
 
 // FavoriteRepository 收藏仓储接口
-type FavoriteRepository interface {
+type IFavoriteRepository interface {
 	Create(ctx context.Context, f any) error
 	Delete(ctx context.Context, id int64) error
 	List(ctx context.Context, filter FavoriteListFilter) (any, error)
@@ -44,7 +45,7 @@ type WrongLogListFilter struct {
 }
 
 // WrongLogRepository 错题日志仓储接口
-type WrongLogRepository interface {
+type IWrongLogRepository interface {
 	Create(ctx context.Context, w any) error
 	Update(ctx context.Context, w any) error
 	GetByID(ctx context.Context, id int64) (any, error)
@@ -64,7 +65,7 @@ type ExamRecordListFilter struct {
 }
 
 // ExamRecordRepository 考试记录仓储接口
-type ExamRecordRepository interface {
+type IExamRecordRepository interface {
 	Create(ctx context.Context, r any) error
 	Update(ctx context.Context, r any) error
 	GetByID(ctx context.Context, id int64) (any, error)
