@@ -8,6 +8,7 @@ import 'element-plus/dist/index.css'
 import App from './App.vue'
 import router from './router'
 import './styles/index.scss'
+import { useLayoutStore } from '@/store/modules/layout'
 
 const app = createApp(App)
 
@@ -21,3 +22,10 @@ app.use(router)
 app.use(ElementPlus, { locale: zhCn })
 
 app.mount('#app')
+
+// 全局路由后置：记录到 TagsView
+router.afterEach((to) => {
+  if (to.meta?.title && !to.meta?.public) {
+    useLayoutStore().addVisitedView({ path: to.path, title: to.meta.title as string })
+  }
+})

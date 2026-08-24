@@ -14,6 +14,13 @@ const routes: RouteRecordRaw[] = [
     redirect: '/dashboard',
   },
   {
+    path: '/dashboard',
+    name: 'DashboardRoot',
+    component: () => import('@/views/admin/Dashboard.vue'),
+    meta: { title: '仪表盘' },
+  },
+
+  {
     path: '/student',
     component: () => import('@/layouts/StudentLayout.vue'),
     meta: { requiresAuth: true, role: 3 },
@@ -37,6 +44,11 @@ const routes: RouteRecordRaw[] = [
       { path: 'papers', name: 'PaperManage', component: () => import('@/views/admin/PaperManage.vue'), meta: { title: '试卷管理' } },
       { path: 'exams', name: 'ExamManage', component: () => import('@/views/admin/ExamManage.vue'), meta: { title: '考试管理' } },
       { path: 'statistics', name: 'Statistics', component: () => import('@/views/admin/Statistics.vue'), meta: { title: '成绩统计' } },
+
+      { path: 'questions/categories', name: 'QuestionCategories', component: () => import('@/views/admin/QuestionCategories.vue'), meta: { title: '分类管理' } },
+      { path: 'grading', name: 'GradingManage', component: () => import('@/views/admin/GradingManage.vue'), meta: { title: '人工批改' } },
+      { path: 'statistics/ranking', name: 'RankingManage', component: () => import('@/views/admin/RankingManage.vue'), meta: { title: '排行榜' } },
+
       { path: 'profile', name: 'AdminProfile', component: () => import('@/views/Profile.vue'), meta: { title: '个人资料' } },
     ],
   },

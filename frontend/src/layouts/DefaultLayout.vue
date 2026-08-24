@@ -1,10 +1,18 @@
 <script setup lang="ts">
-// 默认布局（占位，转发到 dashboard）
-import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
+import { useRouter, RouterView } from 'vue-router'
+
 const router = useRouter()
-router.replace('/admin/dashboard')
+onMounted(() => {
+  // 跳转到 dashboard
+  router.replace('/dashboard')
+})
 </script>
 
 <template>
-  <div></div>
+  <RouterView />
 </template>
+
+<style scoped>
+:deep(.el-result) { min-height: 80vh; display: flex; align-items: center; }
+</style>

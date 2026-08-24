@@ -3,9 +3,9 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <el-config>
+  <el-config-provider>
     <RouterView />
-  </el-config>
+  </el-config-provider>
 </template>
 
 <style>

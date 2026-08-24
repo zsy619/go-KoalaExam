@@ -1,13 +1,152 @@
-@use './reset.scss';
-@use './variables.scss' as *;
+// KoalaExam 全局样式（仿芋道风）
+:root {
+  --koala-header-height: 56px;
+  --koala-sidebar-width: 220px;
+  --koala-sidebar-collapsed-width: 64px;
+  --koala-tags-height: 36px;
+  --koala-primary: #409eff;
+  --koala-bg: #f0f2f5;
+  --koala-aside-bg: #001529;
+  --koala-aside-text: #c0c4cc;
+  --koala-aside-text-active: #ffffff;
+}
+
+html.dark {
+  --koala-bg: #141414;
+  --koala-aside-bg: #1f1f1f;
+}
+
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; }
+body { background: var(--koala-bg); }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+// ====== 通用布局类 ======
+.koala-layout {
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.koala-aside {
+  width: var(--koala-sidebar-width);
+  background: var(--koala-aside-bg);
+  transition: width .25s ease;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  &.collapsed { width: var(--koala-sidebar-collapsed-width); }
+}
+
+.koala-logo {
+  height: var(--koala-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  background: rgba(255,255,255,.05);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  .logo-icon { font-size: 22px; margin-right: 8px; }
+  .logo-text { letter-spacing: 1px; }
+  &.small .logo-icon { margin-right: 0; }
+}
+
+.koala-main-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.koala-header {
+  height: var(--koala-header-height);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+}
+
+html.dark .koala-header {
+  background: #1f1f1f;
+  border-bottom-color: #303030;
+  color: #fafafa;
+}
+
+.koala-breadcrumb {
+  padding: 12px 20px 0;
+  font-size: 14px;
+  background: transparent;
+}
+
+.koala-tags-view {
+  height: var(--koala-tags-height);
+  background: #fff;
+  border-bottom: 1px solid #e6e6e6;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  flex-shrink: 0;
+  .tag-item {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 8px 0 10px;
+    margin-right: 6px;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+    color: #495057;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .2s;
+    &:hover { color: var(--el-color-primary); border-color: var(--el-color-primary); }
+    &.active {
+      background: var(--el-color-primary);
+      color: #fff;
+      border-color: var(--el-color-primary);
+      &::before { content: ''; display: inline-block; width: 6px; height: 6px; background: #fff; border-radius: 50%; margin-right: 6px; }
+    }
+    .close-icon { margin-left: 4px; font-size: 12px; opacity: .6; &:hover { opacity: 1; } }
+  }
+}
+
+html.dark .koala-tags-view { background: #1f1f1f; border-bottom-color: #303030; }
+html.dark .koala-tags-view .tag-item { background: #141414; color: #d9d9d9; border-color: #303030; }
+html.dark .koala-tags-view .tag-item.active { background: var(--el-color-primary); color: #fff; }
+
+.koala-main {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  background: var(--koala-bg);
+}
 
 .koala-card {
   background: #fff;
-  border-radius: $radius;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.06);
-  padding: 20px;
+  border-radius: 4px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
 }
 
-.koala-page {
-  padding: 20px;
+html.dark .koala-card { background: #1f1f1f; color: #fafafa; }
+
+// el-menu 暗色适配
+html.dark .el-menu {
+  background-color: var(--koala-aside-bg);
+  border-color: #303030;
 }
