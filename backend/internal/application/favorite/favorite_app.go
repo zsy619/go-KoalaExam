@@ -72,7 +72,7 @@ func (a *FavoriteApp) BatchAdd(ctx context.Context, req *BatchAddReq) error {
 		if _, err := a.questions.Get(ctx, qid); err != nil {
 			return errcode.New(errcode.CodeQuestionNotExist, "QuestionNotExist")
 		}
-		if _, err := a.favorites.Toggle(ctx, req.UserID, qid, consts.FavoriteTargetQuestion, req.FolderID); err != nil {
+		if _, err := a.favorites.Toggle(ctx, req.UserID, qid, consts.TargetTypeQuestion, req.FolderID); err != nil {
 			return err
 		}
 	}
@@ -200,7 +200,7 @@ func (a *FavoriteApp) autoFavWrong(ctx context.Context, uid int64, qids []int64)
 		}
 	}
 	for _, qid := range qids {
-		_, _ = a.favorites.Toggle(ctx, uid, qid, consts.FavoriteTargetQuestion, folderID)
+		_, _ = a.favorites.Toggle(ctx, uid, qid, consts.TargetTypeQuestion, folderID)
 	}
 	return nil
 }

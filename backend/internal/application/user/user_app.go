@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/your-team/koala-exam-backend/internal/domain/consts"
 	"github.com/your-team/koala-exam-backend/internal/domain/entity"
@@ -23,7 +24,8 @@ import (
 
 // TokenService Token 服务接口。
 type TokenService interface {
-	Generate(userID int64, username string, role int8, tokenType string) (string, error)
+	Generate(userID int64, username string, role int8, tokenType string) (string, time.Time, error)
+	Parse(tokenStr string) (*jwt.Claims, error)
 }
 
 // UserApp 用户应用服务。
@@ -74,7 +76,7 @@ func (a *UserApp) Login(ctx context.Context, username, password, ip string) (*Lo
 
 // RefreshToken 用 refresh token 换取新的 access token。
 func (a *UserApp) RefreshToken(ctx context.Context, refreshToken string) (string, float64, error) {
-	claims, err := jwt.Parse(refreshToken)
+	claims, err := a.tokens.Parse(refreshToken)
 	if err != nil {
 		return "", 0, errcode.New(errcode.CodeTokenInvalid, "TokenInvalid")
 	}
