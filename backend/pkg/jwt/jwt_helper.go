@@ -1,3 +1,9 @@
+// Package jwt JWT 工具。
+//
+// 遵循 Google Go 风格：
+//   - 通过 Helper 结构体持有配置
+//   - 显式错误返回
+//   - 不导出内部状态
 package jwt
 
 import (
@@ -7,7 +13,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Claims 自定义 JWT 声明
+// Token 类型常量
+const (
+	AccessToken  = "access"
+	RefreshToken = "refresh"
+)
+
+// AccessTTL 是默认的 access token 有效期（2 小时）。
+const AccessTTL = 2 * time.Hour
+
+// Claims 自定义 JWT 声明。
 type Claims struct {
 	UserID   int64  `json:"uid"`
 	Username string `json:"uname"`
@@ -16,14 +31,15 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// Helper JWT 工具
+// Helper JWT 工具。
 type Helper struct {
 	secret        []byte
 	issuer        string
-	accessExpire  int
-	refreshExpire int
+	accessExpire  int // 秒
+	refreshExpire int // 秒
 }
 
+// New 构造 Helper。
 func New(secret, issuer string, accessExp, refreshExp int) *Helper {
 	return &Helper{
 		secret:        []byte(secret),
@@ -33,17 +49,18 @@ func New(secret, issuer string, accessExp, refreshExp int) *Helper {
 	}
 }
 
-// Generate 生成 token
+// Generate 生成 token（返回 token、过期时间、error）。
 func (h *Helper) Generate(userID int64, username string, role int8, tokenType string) (string, time.Time, error) {
-	var expSec int
-	if tokenType == "refresh" {
+	expSec := h.accessExpire
+	if tokenType == RefreshToken {
 		expSec = h.refreshExpire
-	} else {
-		expSec = h.accessExpire
 	}
 	exp := time.Now().Add(time.Duration(expSec) * time.Second)
-	claims := Claims{
-		UserID: userID, Username: username, Role: role, Type: tokenType,
+	claims := &Claims{
+		UserID:   userID,
+		Username: username,
+		Role:     role,
+		Type:     tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    h.issuer,
 			ExpiresAt: jwt.NewNumericDate(exp),
@@ -51,34 +68,40 @@ func (h *Helper) Generate(userID int64, username string, role int8, tokenType st
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
 	}
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := t.SignedString(h.secret)
-	return token, exp, err
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := token.SignedString(h.secret)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	return signed, exp, nil
 }
 
-// Parse 解析 token
+// Parse 解析 token 并返回 Claims。
 func (h *Helper) Parse(tokenStr string) (*Claims, error) {
-	t, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
 		return h.secret, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	c, ok := t.Claims.(*Claims)
-	if !ok || !t.Valid {
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
 		return nil, errors.New("invalid token")
 	}
-	return c, nil
+	return claims, nil
 }
 
-// Refresh 刷新 token
+// Refresh 用 refresh token 换 access token。
 func (h *Helper) Refresh(refreshToken string) (string, time.Time, error) {
-	c, err := h.Parse(refreshToken)
+	claims, err := h.Parse(refreshToken)
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	if c.Type != "refresh" {
+	if claims.Type != RefreshToken {
 		return "", time.Time{}, errors.New("not a refresh token")
 	}
-	return h.Generate(c.UserID, c.Username, c.Role, "access")
+	return h.Generate(claims.UserID, claims.Username, claims.Role, AccessToken)
 }
