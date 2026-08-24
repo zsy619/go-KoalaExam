@@ -1,0 +1,259 @@
+# ============================================================
+# KoalaExam (考拉智测) - 项目忽略文件
+# 技术栈：Go (Hertz) + Vue3 + Docker Compose + MySQL + Redis
+# ============================================================
+
+# ---------- IDE / 编辑器 ----------
+# JetBrains (GoLand / WebStorm / IntelliJ)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Vim / Emacs / 其他编辑器临时文件
+*~
+*.swp
+*.swo
+*.swn
+.*.tmp
+*$$
+#*#
+.#*
+
+# ---------- 操作系统 ----------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.Trash-*
+.fuse_hidden*
+
+# ---------- 后端：Go + Hertz (backend/) ----------
+# air 热重载临时目录（.air.toml 中 tmp_dir = "tmp"）
+backend/tmp/
+koala-exam-backend/tmp/   # 旧目录名兼容
+
+# Makefile 编译输出（bin/koala-exam）
+backend/bin/
+koala-exam-backend/bin/
+
+# 测试覆盖率文件（来自 Makefile test-coverage 目标）
+backend/coverage.out
+backend/coverage.html
+koala-exam-backend/coverage.out
+koala-exam-backend/coverage.html
+
+# air 构建错误日志
+backend/build-errors.log
+koala-exam-backend/build-errors.log
+
+# 运行时日志（config.yaml: log.path = logs/koala.log）
+backend/logs/
+koala-exam-backend/logs/
+
+# 用户上传文件（config.yaml: upload.path = uploads/）
+uploads/
+backend/uploads/
+koala-exam-backend/uploads/
+
+# GoLand 项目文件
+backend/.idea/
+backend/*.iml
+
+# 本地嵌入式数据库文件（如启用 SQLite）
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# Go 通用编译产物
+*.exe
+*.exe~
+*.dll
+*.dylib
+*.so
+*.so.*
+*.test
+*.out
+*.cover
+*.coverprofile
+*.gcda
+*.gcno
+
+# GoLand 项目文件
+koala-exam-backend/.idea/
+koala-exam-backend/*.iml
+
+# ---------- 前端：Vue3 + Vite (frontend/) ----------
+frontend/node_modules/
+koala-exam-frontend/node_modules/   # 旧目录名兼容
+
+# Vite / Webpack 构建输出
+frontend/dist/
+frontend/dist-ssr/
+koala-exam-frontend/dist/
+koala-exam-frontend/dist-ssr/
+*.local
+
+# 框架生成产物
+frontend/.nuxt/
+frontend/.next/
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/.vite/
+frontend/.temp/
+koala-exam-frontend/.nuxt/
+koala-exam-frontend/.next/
+koala-exam-frontend/.cache/
+koala-exam-frontend/.parcel-cache/
+koala-exam-frontend/.vite/
+koala-exam-frontend/.temp/
+
+# Vite 环境变量文件（敏感信息勿提交！）
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+koala-exam-frontend/.env
+koala-exam-frontend/.env.local
+koala-exam-frontend/.env.*.local
+
+# 包管理器日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# TypeScript 增量构建
+*.tsbuildinfo
+
+# ---------- Docker ----------
+# docker-compose 中 MySQL/Redis 的持久化目录
+docker-data/
+
+# Docker 本地覆盖配置
+Dockerfile.local
+docker-compose.local.yml
+docker-compose.override.yml
+.docker/
+
+# ---------- 配置 & 密钥（强烈建议勿提交！） ----------
+# 本地环境变量（生产密钥、数据库密码、JWT 密钥等）
+.env
+.env.local
+.env.*.local
+.envrc
+
+# 生产环境配置（包含真实密钥，应通过部署平台注入）
+koala-exam-backend/configs/.env.production
+koala-exam-backend/configs/config.local.yaml
+koala-exam-backend/configs/config.local.yml
+koala-exam-backend/configs/config.local.toml
+*.local.yaml
+*.local.yml
+*.local.toml
+*.local.ini
+
+# TLS 证书与密钥
+*.pem
+*.key
+*.crt
+*.csr
+ssl/
+certs/
+koala-exam-backend/ssl/
+koala-exam-backend/certs/
+
+# ---------- 日志文件 ----------
+*.log
+logs/
+log/
+koala-exam-backend/logs/
+koala-exam-backend/*.log
+
+# ---------- 文档生成产物 ----------
+# swag (Swagger) 生成的代码与文档
+koala-exam-backend/docs/docs.go
+koala-exam-backend/docs/swagger.json
+koala-exam-backend/docs/swagger.yaml
+
+# godoc / hugo 站点
+docs/_site/
+docs/_book/
+docs/public/
+site/
+
+# ---------- 性能分析 ----------
+*.pprof
+*.prof
+pprof/
+koala-exam-backend/pprof/
+
+# ---------- 测试产物 ----------
+.test/
+.test_workspace/
+integration-test/
+e2e/screenshots/
+playwright-report/
+test-results/
+coverage/
+
+# ---------- 临时 / 缓存 / 备份 ----------
+*.tmp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+.cache/
+tmp/
+temp/
+koala-exam-backend/.cache/
+
+# ---------- 协议缓冲（如果使用 protobuf / grpc） ----------
+# *.pb.go
+# *.pb.gw.go
+# *.pb.cc
+# *.pb.h
+
+# ---------- Make / 脚本产物 ----------
+*.mk
+*.mk.bak
+
+# ---------- Python（脚本工具，如有） ----------
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ============================================================
+# 提交规范提醒：
+# 1) go.mod / go.sum 必须提交（依赖锁定）
+# 2) package-lock.json / yarn.lock / pnpm-lock.yaml 应提交（前端依赖锁定）
+# 3) configs/config.yaml 可作为模板提交（不含真实密钥的版本）
+# 4) 生产环境配置请通过 CI/CD 变量或部署平台 Secret 注入
+# ============================================================
