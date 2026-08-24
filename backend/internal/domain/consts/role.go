@@ -19,3 +19,10 @@ func RoleText(r int8) string {
 	}
 	return "未知"
 }
+
+
+// 用户状态
+const (
+	UserStatusDisabled int8 = 0 // 禁用
+	UserStatusNormal   int8 = 1 // 正常
+)
