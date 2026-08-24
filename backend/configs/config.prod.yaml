@@ -1,0 +1,30 @@
+app:
+  name: koala-exam
+  mode: release
+  host: 0.0.0.0
+  port: 8080
+
+log:
+  level: info
+  path: /var/log/koala/koala.log
+
+mysql:
+  driver: mysql
+  host: ${MYSQL_HOST:mysql}
+  port: ${MYSQL_PORT:3306}
+  username: ${MYSQL_USER:root}
+  password: ${MYSQL_PASSWORD:123456}
+  database: ${MYSQL_DB:KoalaExam}
+  max_open_conns: 500
+  max_idle_conns: 100
+
+redis:
+  host: ${REDIS_HOST:redis}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:}
+  pool_size: 200
+
+jwt:
+  secret: ${JWT_SECRET}
+  access_expire: 7200
+  refresh_expire: 604800

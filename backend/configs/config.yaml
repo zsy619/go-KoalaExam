@@ -1,0 +1,75 @@
+# KoalaExam 配置（开发环境）
+app:
+  name: koala-exam
+  mode: debug
+  version: 1.0.0
+  host: 0.0.0.0
+  port: 8080
+  read_timeout: 30
+  write_timeout: 30
+  enable_netpoll: true
+
+log:
+  level: debug
+  path: logs/koala.log
+  max_size: 128
+  max_age: 7
+  max_backups: 10
+  compress: true
+
+mysql:
+  driver: mysql
+  host: 127.0.0.1
+  port: 3306
+  username: root
+  password: "123456"
+  database: KoalaExam
+  charset: utf8mb4
+  parse_time: true
+  loc: Local
+  max_open_conns: 200
+  max_idle_conns: 50
+  conn_max_lifetime: 3600
+  conn_max_idle_time: 600
+  log_level: info
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+  pool_size: 100
+  min_idle_conns: 10
+  dial_timeout: 5
+  read_timeout: 3
+  write_timeout: 3
+
+jwt:
+  secret: koala-exam-secret-key-please-change-in-prod
+  issuer: koala-exam
+  access_expire: 7200
+  refresh_expire: 604800
+  token_header: Authorization
+  token_prefix: "Bearer "
+
+ratelimit:
+  enabled: true
+  qps: 200
+  burst: 400
+  expire: 60
+
+upload:
+  driver: local
+  path: uploads/
+  base_url: http://localhost:8080/uploads
+  max_size: 20
+  allow_ext: ["jpg", "jpeg", "png", "gif", "pdf", "xlsx", "xls"]
+
+anti_cheat:
+  enable_fullscreen: true
+  enable_tab_switch_detect: true
+  max_tab_switch_count: 3
+  enable_copy_paste_block: true
+  shuffle_questions: true
+  shuffle_options: true
+  save_progress_interval: 10
