@@ -12,9 +12,9 @@ const form = ref({ nickname: '', email: '', phone: '', avatar: '' })
 const pwdForm = ref({ old_password: '', new_password: '' })
 
 async function loadProfile() {
-  const { data } = await userApi.profile()
-  profile.value = data!
-  form.value = { nickname: data!.nickname, email: data!.email, phone: data!.phone, avatar: data!.avatar }
+  const data: any = await userApi.profile()
+  profile.value = data
+  form.value = { nickname: data.nickname, email: data.email, phone: data.phone, avatar: data.avatar }
 }
 
 async function saveProfile() {

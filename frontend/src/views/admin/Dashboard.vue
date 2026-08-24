@@ -13,8 +13,8 @@ const pieRef = ref<HTMLDivElement>()
 
 onMounted(async () => {
   try {
-    const { data: d } = await statsApi.dashboard()
-    data.value = d!
+    const d: any = await statsApi.dashboard()
+    data.value = d || data.value
   } catch { /* keep zero */ }
   await nextTick()
   if (chartRef.value) {

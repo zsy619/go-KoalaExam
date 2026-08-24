@@ -11,8 +11,8 @@ const instance: AxiosInstance = axios.create({
 // 请求拦截器：注入 Token
 instance.interceptors.request.use((config) => {
   const userStore = useUserStore()
-  if (userStore.accessToken) {
-    config.headers.Authorization = `Bearer ${userStore.accessToken}`
+  if (userStore.token) {
+    config.headers.Authorization = `Bearer ${userStore.token}`
   }
   return config
 })
@@ -21,8 +21,11 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (resp) => {
     const data = resp.data as BaseResp
-    if (data.code === 0) return resp.data
-    if (data.code === 200002 || data.code === 200005) {
+    if (data.code === 0) {
+      // 返回业务载荷 (data.data)，调用方无需再解一层
+      return data.data !== undefined ? data.data : data
+    }
+    if (data.code === 200002 || data.code === 200005 || data.code === 100002 || data.code === 100005) {
       // 未登录/token 失效
       const userStore = useUserStore()
       userStore.logout()

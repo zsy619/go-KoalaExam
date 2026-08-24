@@ -18,9 +18,9 @@ async function onSubmit() {
   }
   loading.value = true
   try {
-    await userStore.login(form)
+    await userStore.login(form.username, form.password)
     ElMessage.success('登录成功')
-    const redirect = (route.query.redirect as string) || (userStore.isAdmin || userStore.isTeacher ? '/admin/dashboard' : '/student/exam-hall')
+    const redirect = (route.query.redirect as string) || ((userStore.user?.role === 1 || userStore.user?.role === 2) ? '/admin/dashboard' : '/student/exam-hall')
     router.push(redirect)
   } catch (e: any) {
     ElMessage.error(e?.message || '登录失败')

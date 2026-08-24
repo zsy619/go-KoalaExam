@@ -14,8 +14,8 @@ const examId = ref<number>(1)
 async function load() {
   loading.value = true
   try {
-    const { data } = await statsApi.examOverview(examId.value)
-    overview.value = data!
+    const data: any = await statsApi.examOverview(examId.value)
+    overview.value = data || null
   } catch (e: any) {
     ElMessage.error(e.message || '加载失败')
   } finally { loading.value = false }

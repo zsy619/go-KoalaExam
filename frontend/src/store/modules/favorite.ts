@@ -37,11 +37,11 @@ export const useFavoriteStore = defineStore('favorite', {
       }
     },
     async fetchFolders() {
-      const { data } = await favoriteApi.listFolders()
-      this.folders = data || []
+      const data: any = await favoriteApi.listFolders()
+      this.folders = Array.isArray(data) ? data : []
     },
     async checkFromServer(target_type: number, target_id: number): Promise<boolean> {
-      const { data } = await favoriteApi.check({ target_type, target_id })
+      const data: any = await favoriteApi.check({ target_type, target_id })
       this.favMap.set(`${target_type}_${target_id}`, data!.favorited)
       return data!.favorited
     },

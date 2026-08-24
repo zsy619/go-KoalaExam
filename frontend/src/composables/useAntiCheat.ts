@@ -13,7 +13,7 @@ export function useAntiCheat(opts: {
   onAudit: (event: { type: string; payload?: unknown }) => void
 }) {
   const tabSwitchCount = ref(0)
-  const max = opts.maxTabSwitch ?? Number(import.meta.env.VITE_MAX_TAB_SWITCH) || 3
+  const max = opts.maxTabSwitch ?? (Number(import.meta.env.VITE_MAX_TAB_SWITCH) || 3)
 
   function onVisibilityChange() {
     if (document.hidden) {

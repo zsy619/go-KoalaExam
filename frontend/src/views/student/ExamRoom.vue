@@ -30,8 +30,8 @@ const { tabSwitchCount } = useAntiCheat({
 
 async function loadExam() {
   try {
-    const { data } = await examApi.start(examId.value)
-    exam.value = data!
+    const data: any = await examApi.start(examId.value)
+    exam.value = data
     answers.value = {}
     startTimer()
   } catch (e: any) {
@@ -87,7 +87,7 @@ async function onSubmit(force = false) {
   pause()
   try {
     await flushAnswers()
-    const { data } = await examApi.submit(exam.value.record_id)
+    const data: any = await examApi.submit(exam.value.record_id)
     ElMessage.success(`已交卷！得分 ${data?.total_score || 0}`)
     router.push('/student/records')
   } catch (e: any) {

@@ -11,8 +11,8 @@ const loading = ref(false)
 async function fetchList() {
   loading.value = true
   try {
-    const { data } = await examApi.available()
-    list.value = data || []
+    const data: any = await examApi.available()
+    list.value = Array.isArray(data) ? data : (data.list || [])
   } finally { loading.value = false }
 }
 

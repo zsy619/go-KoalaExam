@@ -13,16 +13,16 @@ const stats = ref<UserLearningStats | null>(null)
 async function fetchList() {
   loading.value = true
   try {
-    const { data } = await examApi.myRecords(query.value)
-    list.value = data!.list || []
-    total.value = data!.total
+    const data: any = await examApi.myRecords(query.value)
+    list.value = data.list || []
+    total.value = data.total
   } finally { loading.value = false }
 }
 
 async function fetchStats() {
   try {
-    const { data } = await statsApi.myLearning()
-    stats.value = data!
+    const data: any = await statsApi.myLearning()
+    stats.value = data || null
   } catch { /* ignore */ }
 }
 
